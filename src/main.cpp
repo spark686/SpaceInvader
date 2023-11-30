@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define GL_GLEXT_PROTOTYPES
+
 #include <GL/gl.h>
+#include <GL/glext.h>
 // #include <GL/glu.h>
 #include <GL/glut.h>
 
@@ -20,6 +23,8 @@ int main(int argc, char**argv){
     glutCreateWindow("window");
     glClearColor(0.1f, 0.0f, 0.5f, 1.0f);
     glutDisplayFunc(display);
+
+    std::cout << glGetString(GL_VERSION) << '\n';
 
     glutMainLoop();
     return 0;
