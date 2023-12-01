@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=  -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter
 OBJS_MAIN = src/main.o
-OBJS_SPACE = src/spaceInvader.o src/user.o
+OBJS_SPACE = src/spaceInvader.o src/user.o src/enemies.o 
 LIBS_PATH = -L/opt/homebrew/lib -lGL -lglut
 INC_PATH = -I/opt/homebrew/include
 MAIN= main space
