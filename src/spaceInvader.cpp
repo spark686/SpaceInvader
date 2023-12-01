@@ -8,6 +8,7 @@
 // #include <GL/glu.h>
 #include <GL/freeglut.h>
 #include "user.h"
+#include "enemies.h"
 #include <cstdlib>
 #include <unistd.h>
 #include <vector>
@@ -18,16 +19,23 @@ void display();
 void input_move(int key_input, int x, int y);
 void input_attack(unsigned char key_input, int x, int y);
 void update(int);
-
+void populating_enemies(size_t type_one, size_t type_two, size_t type_three);
+void create_enemies(size_t enemy_type);
 void init_buffers();
+void move_enemies();
+// void check_for_collision()
 
 GLuint ship_vao;
 GLuint ship_vbo;
+GLuint enemies_vao;
+GLuint enemies_vbo;
 GLuint bullet_vao;
 GLuint bullet_vbo;
 User user;
+vector <Enemies*> enemies; 
 
 int main(int argc, char**argv){
+    populating_enemies(1,1,1);
 
     glutInit(&argc, argv);
     glutInitContextVersion(2, 0);
@@ -101,43 +109,11 @@ void init_buffers() {
 
 void update(int) {
     // move things
+    move_enemies();
     glutPostRedisplay();
-    // if ((User::input_position == 1) && (User::user_spaceship[0] < 1)) {
-    //     for (GLuint i = 0; i < 3; ++i) {
-    //         User::user_spaceship[i * 2] += 0.02;
-    //     }
-    // }
-    // else if ((User::input_position == -1) && (User::user_spaceship[2] > -1)) {
-    //     for (GLuint i = 0; i < 3; ++i) {
-    //             User::user_spaceship[i * 2] -= 0.02;
-    //     }
-    // }
-    // User::input_position = 0;
-
-    // // modify the position of the attack balls 
-    // // delete it when it reaches the end 
-    // // GLfloat* one_attack = nullptr;
-    // if (!User::user_attacks.empty()) {
-    //     if (User::user_attacks.at(0)[5] > 0.98f) {
-    //         User::user_attacks.erase(User::user_attacks.begin());
-    //     }
-    // }
-
-    // // move the attack ball by 0.01
-    // // one_attack = nullptr;
-    // if (!User::user_attacks.empty()) {
-    //     for (size_t i = 0; i < User::user_attacks.size(); ++i) {
-    //         // cout << "attack i: " << i << endl;
-    //         for (size_t j = 0; j < 3; ++j) {
-    //             User::user_attacks.at(i)[j * 2 + 1] += 0.01f;  
-    //         }
-    //     }
-    // }
-
     for (Attack& attack: user.attacks) {
         attack.y += 0.01;
     }
-
 
     // create attack ball if user_input == space
     glutTimerFunc(33, update, 0);
@@ -146,19 +122,18 @@ void update(int) {
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
+    glPushMatrix();
+    //draw enemies
+    for(size_t i = 0; i < enemies.size(); i++){
+        Enemies* enemy = enemies.at(i);
+        glPushMatrix();
+        glTranslatef(enemy->x, enemy->y, 0);
+        glBindVertexArray(enemies_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, enemies_vbo);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glPopMatrix();
+    }
     //draw userspaceship  
-
-    // GLuint vao;
-    // glGenVertexArrays(1, &vao);
-    // glBindVertexArray(vao);
-
-    // GLuint vbo;
-    // glGenBuffers(1, &vbo);
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glBufferData(GL_ARRAY_BUFFER, (User::user_attacks.size() + 1) * sizeof(User::user_spaceship), User::user_spaceship, GL_DYNAMIC_DRAW);
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    // glVertexPointer(2, GL_FLOAT, 0, nullptr);
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glPushMatrix();
     glTranslatef(user.x, user.y, 0);
@@ -166,23 +141,10 @@ void display(){
     glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glPopMatrix();
-
     // finished drawing spaceship
 
     // draw user attacks
     for (const Attack& attack: user.attacks) {
-        // GLuint vao_;
-        // glGenVertexArrays(1, &vao_);
-        // glBindVertexArray(vao_);
-
-        // GLuint vbo_;
-        // glGenBuffers(1, &vbo_);
-        // glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        // glBufferData(GL_ARRAY_BUFFER, (User::user_attacks.size() + 1) * sizeof(User::user_spaceship), User::user_attacks.at(i), GL_DYNAMIC_DRAW);
-        // glEnableClientState(GL_VERTEX_ARRAY);
-        // glVertexPointer(2, GL_FLOAT, 0, nullptr);
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-
         glPushMatrix();
         glTranslatef(attack.x, attack.y, 0);
         glBindVertexArray(bullet_vao);
@@ -210,19 +172,46 @@ void input_move(int key_input, int x,  int y) {
 void input_attack(unsigned char key_input, int x, int y) {
     // if user pressed space bar
     if (key_input == 32) {
-        // GLfloat new_attack[6];
-        // // cout << "here" << endl;
-
-        // // making new attack ball
-        // new_attack[0] = (User::user_spaceship[0] + User::user_spaceship[4]) / 2.0f;
-        // new_attack[1] = User::user_spaceship[5] + 0.01f;
-        // new_attack[2] = (User::user_spaceship[2] + User::user_spaceship[4]) / 2.0f;
-        // new_attack[3] = User::user_spaceship[5] + 0.01f;
-        // new_attack[4] = (new_attack[0] + new_attack[2]) / 2.0f;
-        // new_attack[5] = new_attack[1] + 0.04f;
-        // User::user_attacks.push_back(new_attack);
-
         user.attacks.push_back(Attack(user.x, user.y + 0.05));
         // cout << User::user_attacks.size() << endl;
     }
 }
+
+void create_enemies(size_t enemy_type){
+    if (enemy_type == 1){
+        Enemies_Type_One* new_enemy = new Enemies_Type_One();
+        enemies.push_back(new_enemy);
+    } else if (enemy_type == 2){
+        Enemies_Type_Two* new_enemy = new Enemies_Type_Two();
+        enemies.push_back(new_enemy);
+    } else if (enemy_type == 3){
+        Enemies_Type_Three* new_enemy = new Enemies_Type_Three();
+        enemies.push_back(new_enemy);
+    } else {
+        cout << "invalid enemy type" << endl;
+    }
+}
+
+void populating_enemies(size_t type_one, size_t type_two, size_t type_three){
+    for(size_t i = 0; i < type_one; i++){
+        create_enemies(1);
+    }
+    for(size_t i = 0; i < type_two; i++){
+        create_enemies(2);
+    }
+    for(size_t i = 0; i < type_three; i++){
+        create_enemies(3);
+    }
+}   
+
+void move_enemies(){
+    for(size_t i = 0; i < enemies.size(); i++){
+        Enemies* enemy = enemies.at(i);
+        enemy->enemies_movement();
+    }
+}
+
+// void check_for_collision(){
+
+// }
+
