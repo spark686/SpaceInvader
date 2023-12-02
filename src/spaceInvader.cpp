@@ -156,7 +156,7 @@ void display(){
         glTranslatef(enemy->x, enemy->y, 0);
         glBindVertexArray(enemies_vao);
         glBindBuffer(GL_ARRAY_BUFFER, enemies_vbo);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_POINTS, 0, 3);
         glPopMatrix();
     }
     cout << 14 << endl;
@@ -166,7 +166,7 @@ void display(){
     glTranslatef(user.x, user.y, 0);
     glBindVertexArray(ship_vao);
     glBindBuffer(GL_ARRAY_BUFFER, ship_vbo);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_POINTS, 0, 3);
     glPopMatrix();
     // finished drawing spaceship
 
@@ -176,7 +176,7 @@ void display(){
         glTranslatef(attack.x, attack.y, 0);
         glBindVertexArray(bullet_vao);
         glBindBuffer(GL_ARRAY_BUFFER, bullet_vbo);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_POINTS, 0, 3);
         glPopMatrix();
     }
     
