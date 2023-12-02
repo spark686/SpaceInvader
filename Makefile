@@ -11,13 +11,13 @@ MAIN= main space
 all: main space
 
 main: $(OBJS_MAIN)
-	$(CXX) $(CXXFLAGS) $(INC_PATH) $+ -o $@ $(LIBS_PATH)
+	$(CXX) $(CXXFLAGS) $(OBJS_MAIN) -o $@ $(INC_PATH) $(LIBS_PATH)
 
 space: $(OBJS_SPACE)
-	$(CXX) $(CXXFLAGS) $(INC_PATH) $+ -o $@ $(LIBS_PATH)
+	$(CXX) $(CXXFLAGS) $(OBJS_SPACE) -o $@ $(INC_PATH) $(LIBS_PATH)
 
 src/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) -c $(INC_PATH) $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean: 
 	$(RM) main space src/*.o src/lib/*.o

@@ -37,9 +37,7 @@ vector <Enemies*> enemies;
 int main(int argc, char**argv){
     populating_enemies(1,1,1);
 
-    glutInit(&argc, argv);
-    glutInitContextVersion(2, 0);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
+    glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_RGBA);
 
     glutInitWindowSize(500, 700);
@@ -48,16 +46,26 @@ int main(int argc, char**argv){
     glClearColor(0.05f, 0.0f, 0.1f, 1.0f);
 
     // User user_;
+    cout << 1 << endl;
     init_buffers();
+    cout << 2 << endl;
 
     glutDisplayFunc(display);
     // sleep(1);
+    cout << 3 << endl;
+
     glutKeyboardFunc(input_attack);
+    cout << 4 << endl;
+
     glutSpecialFunc(input_move);
+    cout << 5 << endl;
+
 
     glutTimerFunc(33, update, 0);
+    cout << 6 << endl;
 
     glutMainLoop();
+    cout << 7 << endl;
     return 0;
 }
 
@@ -74,7 +82,13 @@ void init_buffers() {
          0.000f, +0.005f
     };
 
-    std::cout << glGetString(GL_VERSION) << '\n';;
+    GLfloat enemies[6] = {
+        +0.005f, -0.005f,
+        -0.005f, -0.005f,
+         0.000f, +0.005f
+    };
+
+    // std::cout << glGetString(GL_VERSION) << '\n';;
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -82,6 +96,14 @@ void init_buffers() {
     glGenVertexArrays(2, ids);
     ship_vao   = ids[0];
     bullet_vao = ids[1];
+
+    glBindVertexArray(enemies_vao);
+
+    glGenBuffers(1, &enemies_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, enemies_vao);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(enemies), enemies, GL_DYNAMIC_DRAW);
+    glVertexPointer(2, GL_FLOAT, 0, nullptr);
+    glBindVertexArray(0);
 
 
     // glGenVertexArrays(1, &ship_vao);
@@ -105,7 +127,7 @@ void init_buffers() {
 
     std::cout << "Ship:   " << ship_vao   << ' ' << ship_vbo   << '\n';
     std::cout << "Bullet: " << bullet_vao << ' ' << bullet_vbo << '\n';
-};
+}
 
 void update(int) {
     // move things
@@ -120,10 +142,14 @@ void update(int) {
 }
 
 void display(){
+    cout << 10 << endl;
     glClear(GL_COLOR_BUFFER_BIT);
+    cout << 11 << endl;
     glLoadIdentity();
+    cout << 12 << endl;
     glPushMatrix();
     //draw enemies
+    cout << 13 << endl;
     for(size_t i = 0; i < enemies.size(); i++){
         Enemies* enemy = enemies.at(i);
         glPushMatrix();
@@ -133,6 +159,7 @@ void display(){
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glPopMatrix();
     }
+    cout << 14 << endl;
     //draw userspaceship  
 
     glPushMatrix();
@@ -205,8 +232,9 @@ void populating_enemies(size_t type_one, size_t type_two, size_t type_three){
 }   
 
 void move_enemies(){
+    Enemies* enemy = nullptr;
     for(size_t i = 0; i < enemies.size(); i++){
-        Enemies* enemy = enemies.at(i);
+        enemy = enemies.at(i);
         enemy->enemies_movement();
     }
 }
