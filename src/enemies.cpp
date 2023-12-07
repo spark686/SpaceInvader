@@ -27,3 +27,9 @@ void Enemies::enemies_movement(){
     return;
 }
 
+void Enemies::minus_health(){
+    health--;
+    if(health == 0){
+        is_alive = false;
+    }
+}

@@ -21,14 +21,16 @@ struct Enemies {
     vector <Attack> attack;
     float x;
     float y;
+    size_t health;
     size_t type;
-
+    void minus_health();
     Enemies(){
         this->heading_left = false;
         this->type = 0;
         this->is_alive = true;
         this->x = 0;
         this->y = 0;
+        this->health = 0;
     }
     // static bool did_attack;
 };
@@ -41,6 +43,7 @@ struct Enemies_Type_One: public Enemies{
         this->is_alive = true;
         this->x = 0.0;
         this->y = 0.4;
+        this->health = 1;
     }
 };
 
@@ -52,6 +55,7 @@ struct Enemies_Type_Two: public Enemies{
         this->is_alive = true;
         this->x = 0.0;
         this->y = 0.6;
+        this->health= 2;
     }
 };
 
@@ -63,5 +67,6 @@ struct Enemies_Type_Three: public Enemies{
         this->is_alive = true;
         this->x = 0.0;
         this->y = 0.8;
+        this->health = 3;
     }
 };

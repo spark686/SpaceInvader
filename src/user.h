@@ -27,7 +27,7 @@ struct User {
     vector<Attack> attacks;
     static GLfloat input_position;
     // static bool did_attack;
-
+    bool is_alive = true;
     float x =  0.0;
     float y = -0.8;
 };
