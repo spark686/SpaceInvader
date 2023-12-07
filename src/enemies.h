@@ -65,5 +65,3 @@ struct Enemies_Type_Three: public Enemies{
     }
 };
 
-
-

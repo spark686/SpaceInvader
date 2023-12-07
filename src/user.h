@@ -14,10 +14,11 @@ using namespace std;
 struct Attack {
     float x;
     float y;
-
+    bool is_alive;
     Attack(float x, float y) {
         this->x = x;
         this->y = y;
+        this->is_alive = true;
     }
 };
 

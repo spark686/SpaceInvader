@@ -53,7 +53,7 @@ bool is_playing = true;
 vector <Enemies*> enemies; 
 
 int main(int argc, char**argv){
-    populating_enemies(1,1,1);    
+    populating_enemies(10,10,10);    
     // GLenum error = glGetError();
     // if (error != GL_NO_ERROR) {
     //     cout << "error" << endl;
@@ -63,41 +63,10 @@ int main(int argc, char**argv){
     // }
     glutInit(&argc,argv);
     glutInitDisplayMode(GLUT_RGBA);
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    //     }
-    // else {
-    //     cout << "error" << endl;
-    // }
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-
     glutInitWindowSize(500, 700);
 
     glutCreateWindow("window");
     glClearColor(0.05f, 0.0f, 0.1f, 1.0f);
-
-    // User user_;
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    //     }
-    // else {
-    //     cout << "error" << endl;
-    // }
-
-
-    // sleep(1);
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    //     }
-    // else {
-    //     cout << "error" << endl;
-    // }
 
     glutKeyboardFunc(input_attack);
     glutSpecialFunc(input_move);
@@ -274,31 +243,7 @@ void display(){
         end_win_screen();
     }
     else {
-    
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    // }
-    // else {
-    //     cout << "error" << endl;
-    // }
-    // cout << 11 << endl;
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    //     }
-    // else {
-    //     cout << "error" << endl;
-    // }
         glLoadIdentity();
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     cout << "no error" << endl;
-    //     }
-    // else {
-    //     cout << "error" << endl;
-    // }
-    // cout << 12 << endl;
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
         glRasterPos2f(0.650f, 0.90f);
@@ -312,15 +257,6 @@ void display(){
 
     //draw userspaceship  
 
-
-    // glPushMatrix();
-    // GLenum error = glGetError();
-    // if (error != GL_NO_ERROR) {
-    //     fprintf(stderr, "OpenGL Error: %d\n", error);
-    // } 
-    // else {
-    //     cout << "no error" << endl;
-    // }
         GLfloat spaceship[6] = {
             +0.05f + user.x, -0.85f,
             -0.05f + user.x, -0.85f,
@@ -506,8 +442,12 @@ void input_attack(unsigned char key_input, int x, int y) {
 
 
 void create_enemies(size_t enemy_type){
+    // x_pos_1 = 0.4;
+    // x_pos_2 = 0.4;
+    // x_pos_3 = 0.4;
     if (enemy_type == 1){
         Enemies_Type_One* new_enemy = new Enemies_Type_One();
+        // new_enemy->x;
         enemies.push_back(new_enemy);
     } else if (enemy_type == 2){
         Enemies_Type_Two* new_enemy = new Enemies_Type_Two();
@@ -547,6 +487,4 @@ bool check_for_collision(float e_x_coord, float e_y_coord, float a_x_coord, floa
         return false;
     }
 }
-
-
 
