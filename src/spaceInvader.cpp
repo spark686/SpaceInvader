@@ -28,15 +28,18 @@ void survival(int);
 void input_attack(unsigned char key_input, int x, int y);
 void input_mouse(int click, int state, int x, int y);
 int score = 0;
+int time_ingame = 0;
+int counter = 0;
 void update(int);
 void manage_attack(int);
-void populating_enemies(size_t type_one, size_t type_two, size_t type_three);
-void create_enemies(size_t enemy_type);
+void populating_enemies(size_t lvl);
+void create_enemies(size_t enemy_type, float pos_x);
 void init_buffers();
 void move_enemies();
 void start_screen();
 void end_lost_screen();
 void end_win_screen();
+void enemy_attack();
 
 bool check_for_collision(float e_x_coord, float e_y_coord, float a_x_coord, float a_y_coord);
 
@@ -51,9 +54,12 @@ bool is_start = true;
 bool is_attack = true;
 bool is_playing = true;
 vector <Enemies*> enemies; 
+vector <Enemies_Type_One*> enemies_one; 
+vector <Enemies_Type_Two*> enemies_two; 
+vector <Enemies_Type_Three*> enemies_three; 
 
 int main(int argc, char**argv){
-    populating_enemies(10,10,10);    
+    populating_enemies(1);    
     // GLenum error = glGetError();
     // if (error != GL_NO_ERROR) {
     //     cout << "error" << endl;
@@ -82,7 +88,6 @@ int main(int argc, char**argv){
     //     else {
     //        cout << "1no error" << endl;
     //     }
-
     glutMainLoop();
     return 0;
 }
@@ -207,6 +212,18 @@ void init_buffers() {
 }
 
 void update(int) {
+    for (size_t i = 0; i < enemies_three.size(); i++) {
+        Enemies_Type_Three* enemy = enemies_three.at(i);                    
+        for (size_t i = 0; i < enemy->attacks.size(); i++) {
+            Attack attack = enemy->attacks.at(i);     
+            attack.y += 1;
+        }
+    }
+    if(!is_start){
+        enemy_attack();
+        counter++;
+        time_ingame = counter*0.05;;
+    }
     // move things
     move_enemies();
     glutPostRedisplay();
@@ -226,9 +243,6 @@ void update(int) {
 
 void manage_attack(int) {
     is_attack = true;
-    if (is_playing) {
-        score += 1;
-    }
     glutTimerFunc(300, manage_attack, 0);
 }
 
@@ -254,6 +268,15 @@ void display(){
         const unsigned char* score_string_literal = reinterpret_cast<const unsigned char*>(score_literal);
 
         glutBitmapString(GLUT_BITMAP_HELVETICA_18, score_string_literal);
+
+        glRasterPos2f(0.650f, 0.80f);
+        glColor3f(-0.20f, 1.0f, 1.0f);
+        string time_string = to_string(time_ingame);
+        time_string = "time: " + time_string;
+        const char* time_literal = time_string.c_str();
+        const unsigned char* time_string_literal = reinterpret_cast<const unsigned char*>(time_literal);
+
+        glutBitmapString(GLUT_BITMAP_HELVETICA_18, time_string_literal);
 
     //draw userspaceship  
 
@@ -309,73 +332,86 @@ void display(){
     // glPushMatrix();
     // //draw enemies
     // // cout << 13 << endl;
-    for(size_t i = 0; i < enemies.size(); i++){
-        Enemies* enemy = enemies.at(i);
-        if(enemy->is_alive){
-            glPushMatrix();
-            glTranslatef(enemy->x, enemy->y, 0);
-            glBindVertexArray(enemy_vao);
-            glBindBuffer(GL_ARRAY_BUFFER, enemy_vbo);
-            if(enemy->type == 3){
-                glColor3f(0.5f, 1.0f, 1.0f);
-            } else if (enemy->type == 2){
-                glColor3f(0.0f, 1.0f, 0.0f);
-            } else {
-                glColor3f(0.5f, 0.0f, 0.0f);
-            }
-            glBegin(GL_QUADS);
-            glVertex2f(-0.05f, 0.05f); // top left
-            glVertex2f(0.05f, 0.05f); // top right 
-            glVertex2f(0.05f, 0.0f); // bottom right
-            glVertex2f(-0.05f, 0.0f); // bottom left
-            glEnd();
-            glPopMatrix();
-        }
-    }
-    // cout << 14 << endl;
-
-    // draw user attacks
-    for (size_t i = 0; i < user.attacks.size(); i++) {
-        Attack attack = user.attacks.at(i);
-        cout << attack.is_alive << "here" << endl;
-        
-        if(attack.is_alive){
-            glPushMatrix();
-            glTranslatef(attack.x, attack.y, 0);
-            glBindVertexArray(bullet_vao);
-            glBindBuffer(GL_ARRAY_BUFFER, bullet_vbo);
-            glColor3f(0.0f, 1.0f, 1.0f);
-            glDrawArrays(GL_POINTS, 0, 3);
-            glPopMatrix();
-        }
-    }
-
-    for (size_t i = 0; i < user.attacks.size(); i++) {
-        cout << i << endl;
-        Attack attack = user.attacks.at(i);
-        if (attack.y < 0.3){
-            break;
-        } 
-        if(attack.is_alive){
-            for(size_t i = 0; i < enemies.size(); i++){
+        for(size_t i = 0; i < enemies.size(); i++){
             Enemies* enemy = enemies.at(i);
-            if(check_for_collision(enemy->x, enemy->y, attack.x, attack.y)){
-                cout << "attack dies" << endl;
-                attack.is_alive = false;
-                enemy->is_alive = false;
-                score += 10;
+            if(enemy->is_alive){
+                glPushMatrix();
+                glTranslatef(enemy->x, enemy->y, 0);
+                glBindVertexArray(enemy_vao);
+                glBindBuffer(GL_ARRAY_BUFFER, enemy_vbo);
+                if(enemy->type == 3){
+                    glColor3f(0.5f, 1.0f, 1.0f);
+                } else if (enemy->type == 2){
+                    glColor3f(0.0f, 1.0f, 0.0f);
+                } else {
+                    glColor3f(0.5f, 0.0f, 0.0f);
                 }
-            
+                glBegin(GL_QUADS);
+                glVertex2f(-0.05f, 0.05f); // top left
+                glVertex2f(0.05f, 0.05f); // top right 
+                glVertex2f(0.05f, 0.0f); // bottom right
+                glVertex2f(-0.05f, 0.0f); // bottom left
+                glEnd();
+                glPopMatrix();
             }
         }
-    }
+        // cout << 14 << endl;
 
-    
+        // draw user attacks
+        // for (size_t i = 0; i < enemies_three.size(); i++) {
+        //     Enemies_Type_Three* enemy = enemies_three.at(i);                    
+        //     for (size_t i = 0; i < enemy->attacks.size(); i++) {
+        //         Attack attack = enemy->attacks.at(i);     
+        //         glPushMatrix();
+        //         glTranslatef(attack.x, attack.y, 0);
+        //         glBindVertexArray(bullet_vao);
+        //         glBindBuffer(GL_ARRAY_BUFFER, bullet_vbo);
+        //         glColor3f(0.0f, 1.0f, 1.0f);
+        //         glDrawArrays(GL_POINTS, 0, 3);
+        //         glPopMatrix();
+        //     }
+        // }
+
+        for (size_t i = 0; i < user.attacks.size(); i++) {
+            Attack attack = user.attacks.at(i);                    
+            if(attack.is_alive){
+                glPushMatrix();
+                glTranslatef(attack.x, attack.y, 0);
+                glBindVertexArray(bullet_vao);
+                glBindBuffer(GL_ARRAY_BUFFER, bullet_vbo);
+                glColor3f(0.0f, 1.0f, 1.0f);
+                glDrawArrays(GL_POINTS, 0, 3);
+                glPopMatrix();
+            }
+        }
+
+        for (size_t i = 0; i < user.attacks.size(); i++) {
+            Attack attack = user.attacks.at(i);
+            if (attack.y < 0.3){
+                break;
+            } 
+            if(attack.is_alive){
+                for(size_t i = 0; i < enemies.size(); i++){
+                Enemies* enemy = enemies.at(i);
+                    if (enemy->is_alive){
+                        cout << "is alive" << endl;
+                        if(check_for_collision(enemy->x, enemy->y, attack.x, attack.y)){
+                            cout << "is hit" << endl;
+                            attack.is_alive = false;
+                            enemy->is_alive = false;
+                            score += 10;
+                        }
+                    
+                    }
+            }
+        }
+
+        }
     // glDisableClientState(GL_VERTEX_ARRAY);
-        cout << "dislays" << endl;
+cout << "dislays" << endl;
     }
     glutSwapBuffers();
-    // GLenum error = glGetError();
+// GLenum error = glGetError();
     // if (error != GL_NO_ERROR) {
     //     cout << "error" << endl;
     // }
@@ -400,10 +436,10 @@ void input_move(int key_input, int x,  int y) {
         // User::input_position = 1;
         if(user.x < 0.8){
             user.x += 0.1;
-        }
+            }
         // glutPostRedisplay();
 
-    }
+}
 }
 
 // start button click checker
@@ -447,14 +483,14 @@ void create_enemies(size_t enemy_type){
     // x_pos_3 = 0.4;
     if (enemy_type == 1){
         Enemies_Type_One* new_enemy = new Enemies_Type_One();
-        // new_enemy->x;
-        enemies.push_back(new_enemy);
+                // new_enemy->x;
+                enemies.push_back(new_enemy);
     } else if (enemy_type == 2){
         Enemies_Type_Two* new_enemy = new Enemies_Type_Two();
-        enemies.push_back(new_enemy);
+                enemies.push_back(new_enemy);
     } else if (enemy_type == 3){
         Enemies_Type_Three* new_enemy = new Enemies_Type_Three();
-        enemies.push_back(new_enemy);
+                enemies.push_back(new_enemy);
     } else {
         cout << "invalid enemy type" << endl;
     }
@@ -462,13 +498,13 @@ void create_enemies(size_t enemy_type){
 
 void populating_enemies(size_t type_one, size_t type_two, size_t type_three){
     for(size_t i = 0; i < type_one; i++){
-        create_enemies(1);
+    create_enemies(1);
     }
     for(size_t i = 0; i < type_two; i++){
-        create_enemies(2);
+    create_enemies(2);
     }
     for(size_t i = 0; i < type_three; i++){
-        create_enemies(3);
+    create_enemies(3);
     }
 }   
 
@@ -481,10 +517,98 @@ void move_enemies(){
 }
 
 bool check_for_collision(float e_x_coord, float e_y_coord, float a_x_coord, float a_y_coord){
-    if ((e_y_coord < a_y_coord) && (a_y_coord < e_x_coord + 0.5f) && (e_x_coord - 0.5f < a_x_coord) && (a_x_coord < e_x_coord + 0.5f)){
+    if ((e_y_coord < a_y_coord) && (a_y_coord < e_y_coord + 0.05f) && (e_x_coord - 0.05f < a_x_coord) && (a_x_coord < e_x_coord + 0.05f)){
         return true;
     } else {
         return false;
     }
 }
 
+void create_enemies(size_t enemy_type, float pos_x){
+    // x_pos_1 = 0.4;
+    // x_pos_2 = 0.4;
+    // x_pos_3 = 0.4;
+    if (enemy_type == 1){
+        Enemies_Type_One* new_enemy = new Enemies_Type_One();
+        new_enemy->x = pos_x;
+        // new_enemy->x;
+        enemies_one.push_back(new_enemy);
+        enemies.push_back(new_enemy);
+    } else if (enemy_type == 2){
+        Enemies_Type_Two* new_enemy = new Enemies_Type_Two();
+        new_enemy->x = pos_x;
+        enemies_two.push_back(new_enemy);
+        enemies.push_back(new_enemy);
+    } else if (enemy_type == 3){
+        Enemies_Type_Three* new_enemy = new Enemies_Type_Three();
+        new_enemy->x = pos_x;
+        enemies_three.push_back(new_enemy);
+        enemies.push_back(new_enemy);
+    } else {
+        cout << "invalid enemy type" << endl;
+    }
+}
+
+void populating_enemies(size_t lvl){
+    if (lvl == 1){
+        float pos_x = 0.8;
+        for(size_t i = 0; i < 4; i++){
+            create_enemies(1, pos_x);
+            pos_x -= 0.2;
+        }
+        pos_x = 0.8;
+        for(size_t i = 0; i < 4; i++){
+            create_enemies(2, pos_x);
+            pos_x -= 0.2;
+        }
+        pos_x = 0.8;
+        for(size_t i = 0; i < 4; i++){
+            create_enemies(3, pos_x);
+            pos_x -= 0.2;
+        }
+    } 
+    //   else if (lvl == 2){
+    //     float pos_x = 0.4;
+    //     for(size_t i = 0; i < 9; i++){
+    //         create_enemies(1, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    //     pos_x = 0.4;
+    //     for(size_t i = 0; i < 9; i++){
+    //         create_enemies(2, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    //     pos_x = 0.4;
+    //     for(size_t i = 0; i < 9; i++){
+    //         create_enemies(3, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    // } else if (lvl == 3){
+    //     float pos_x = 0.6;
+    //     for(size_t i = 0; i < 13; i++){  
+    //         create_enemies(1, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    //     pos_x = 0.6;
+    //     for(size_t i = 0; i < 13; i++){
+    //         create_enemies(2, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    //     pos_x = 0.6;
+    //     for(size_t i = 0; i < 13; i++){
+    //         create_enemies(3, pos_x);
+    //         pos_x -= 0.1;
+    //     }
+    // }
+}   
+
+
+void enemy_attack(){
+    for(size_t i = 0; i < enemies_three.size(); i++){
+        Enemies_Type_Three* enemy_three = enemies_three.at(i);
+        if (time_ingame % 2 == 0){
+            enemy_three->attacks.push_back(Attack(enemy_three->x, enemy_three->y + 0.05));
+        }
+    }
+    cout << "enemy attack" << endl;
+}

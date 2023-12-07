@@ -17,7 +17,8 @@ struct Enemies {
     static GLfloat input_position;
     bool heading_left;
     bool is_alive;
-    virtual void enemies_movement();
+    void enemies_movement();
+    vector <Attack> attack;
     float x;
     float y;
     size_t type;
@@ -33,7 +34,7 @@ struct Enemies {
 };
 
 struct Enemies_Type_One: public Enemies{
-    void enemies_movement();
+    // void enemies_movement();
     Enemies_Type_One(){
         this->heading_left = false;
         this->type = 1;
@@ -44,7 +45,7 @@ struct Enemies_Type_One: public Enemies{
 };
 
 struct Enemies_Type_Two: public Enemies{
-    void enemies_movement();
+    // void enemies_movement();
     Enemies_Type_Two(){
         this->heading_left = false;
         this->type = 2;
@@ -55,7 +56,7 @@ struct Enemies_Type_Two: public Enemies{
 };
 
 struct Enemies_Type_Three: public Enemies{
-    void enemies_movement();
+    // void enemies_movement();
     Enemies_Type_Three(){
         this->heading_left = false;
         this->type = 3;
@@ -64,4 +65,3 @@ struct Enemies_Type_Three: public Enemies{
         this->y = 0.8;
     }
 };
-
